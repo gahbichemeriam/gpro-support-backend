@@ -1,0 +1,45 @@
+# ===== Maven =====
+target/
+!.mvn/wrapper/maven-wrapper.jar
+!**/src/main/**/target/
+!**/src/test/**/target/
+
+# ===== IntelliJ IDEA =====
+.idea/
+*.iws
+*.iml
+*.ipr
+out/
+!**/src/main/**/out/
+!**/src/test/**/out/
+
+# ===== Eclipse =====
+.apt_generated
+.classpath
+.factorypath
+.project
+.settings
+.springBeans
+.sts4-cache
+
+# ===== VS Code =====
+.vscode/
+
+# ===== Secrets & Configuration locale =====
+# Ne JAMAIS envoyer les mots de passe ou clés API sur GitHub
+application-local.properties
+application-secret.properties
+*.env
+.env
+
+# ===== Logs =====
+*.log
+logs/
+spring.log
+
+# ===== Fichiers uploadés par l'application =====
+uploads/
+
+# ===== OS =====
+.DS_Store
+Thumbs.db
