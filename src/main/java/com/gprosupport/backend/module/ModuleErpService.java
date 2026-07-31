@@ -24,7 +24,7 @@ public class ModuleErpService {
     public List<ModuleErpResponse> findAll(Long projetId) {
         List<ModuleErp> modules = (projetId != null)
                 ? moduleRepository.findByProjetErpId(projetId)
-                : moduleRepository.findAll();
+                : moduleRepository.findAllWithProjet();
 
         return modules.stream().map(this::toResponse).toList();
     }

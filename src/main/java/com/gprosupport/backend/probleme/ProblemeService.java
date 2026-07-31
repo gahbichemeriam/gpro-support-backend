@@ -20,12 +20,18 @@ public class ProblemeService {
     private final ProblemeRepository problemeRepository;
     private final ModuleErpRepository moduleRepository;
 
+    /**
+     * Charge le problème avec ses relations (module + projet) en une seule requête SQL.
+     * Évite le problème LazyInitializationException :
+     * sans ça, accéder à p.getModuleErp().getProjetErp() hors transaction plante.
+     */
+
     /** Liste tous les problèmes, avec filtre optionnel par module. */
     @Transactional(readOnly = true)
     public List<ProblemeResponse> findAll(Long moduleId) {
         List<ProblemeFonctionnalite> problemes = (moduleId != null)
                 ? problemeRepository.findByModuleErpId(moduleId)
-                : problemeRepository.findAll();
+                : problemeRepository.findAllWithRelations();
         return problemes.stream().map(this::toResponse).toList();
     }
 

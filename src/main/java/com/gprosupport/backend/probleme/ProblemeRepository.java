@@ -12,23 +12,29 @@ import java.util.Optional;
 public interface ProblemeRepository extends JpaRepository<ProblemeFonctionnalite, Long> {
 
     /** Recherche par code erreur exact (ex : "ERR-PROD-201"). */
-    Optional<ProblemeFonctionnalite> findByCodeErreur(String codeErreur);
-
-    /** Tous les problèmes d'un module. */
-    List<ProblemeFonctionnalite> findByModuleErpId(Long moduleId);
-
-    /**
-     * Recherche textuelle : titre contenant le mot-clé (insensible à la casse).
-     * Spring génère : WHERE LOWER(titre) LIKE LOWER('%mot%')
-     */
-    List<ProblemeFonctionnalite> findByTitreContainingIgnoreCase(String mot);
-
-    /**
-     * Recherche combinée texte OU code erreur — pour la barre de recherche de l'agent.
-     * @Query = on écrit le JPQL (Java Persistence Query Language) nous-mêmes.
-     * JPQL ressemble à SQL mais utilise les noms de classes Java, pas les tables SQL.
-     */
     @Query("SELECT p FROM ProblemeFonctionnalite p " +
+           "JOIN FETCH p.moduleErp m " +
+           "JOIN FETCH m.projetErp " +
+           "WHERE p.codeErreur = :codeErreur")
+    Optional<ProblemeFonctionnalite> findByCodeErreur(@Param("codeErreur") String codeErreur);
+
+    /** Tous les problèmes avec leurs relations chargées. */
+    @Query("SELECT p FROM ProblemeFonctionnalite p " +
+           "JOIN FETCH p.moduleErp m " +
+           "JOIN FETCH m.projetErp")
+    List<ProblemeFonctionnalite> findAllWithRelations();
+
+    /** Tous les problèmes d'un module avec leurs relations. */
+    @Query("SELECT p FROM ProblemeFonctionnalite p " +
+           "JOIN FETCH p.moduleErp m " +
+           "JOIN FETCH m.projetErp " +
+           "WHERE m.id = :moduleId")
+    List<ProblemeFonctionnalite> findByModuleErpId(@Param("moduleId") Long moduleId);
+
+    /** Recherche combinée texte OU code erreur avec relations chargées. */
+    @Query("SELECT p FROM ProblemeFonctionnalite p " +
+           "JOIN FETCH p.moduleErp m " +
+           "JOIN FETCH m.projetErp " +
            "WHERE LOWER(p.titre) LIKE LOWER(CONCAT('%', :terme, '%')) " +
            "OR LOWER(p.codeErreur) LIKE LOWER(CONCAT('%', :terme, '%'))")
     List<ProblemeFonctionnalite> rechercher(@Param("terme") String terme);
