@@ -71,11 +71,13 @@ public class GlobalExceptionHandler {
 
     /**
      * Filet de sécurité : toute exception non prévue → HTTP 500.
+     * Retourne le vrai message pour faciliter le debug en développement.
      */
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ApiResponse<Void>> handleGeneral(Exception ex) {
+        ex.printStackTrace(); // affiche la stack trace complète dans la console IntelliJ
         return ResponseEntity
                 .status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body(ApiResponse.error("Erreur interne du serveur."));
+                .body(ApiResponse.error(ex.getClass().getSimpleName() + " : " + ex.getMessage()));
     }
 }
