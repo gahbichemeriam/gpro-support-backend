@@ -10,19 +10,15 @@ import java.util.List;
 @Repository
 public interface ClientRepository extends JpaRepository<Client, Long> {
 
-    /** Tous les clients d'un projet. */
-    List<Client> findByProjetErpId(Long projetId);
+    @Query("SELECT c FROM Client c JOIN FETCH c.projetErp JOIN FETCH c.versionActive " +
+           "WHERE c.projetErp.id = :projetId")
+    List<Client> findByProjetErpId(@Param("projetId") Long projetId);
 
-    /**
-     * Trouve les clients dont la version active est inférieure à la version corrective
-     * d'un problème donné → pour déclencher les alertes de mise à niveau.
-     *
-     * Cette requête sera utilisée dans la logique d'alerte automatique.
-     */
-    @Query("SELECT c FROM Client c " +
-           "JOIN ApplicabiliteVersion av ON av.versionCorrective.id IS NOT NULL " +
-           "WHERE c.projetErp.id = :projetId " +
-           "AND c.versionActive.id = :versionId")
+    @Query("SELECT c FROM Client c JOIN FETCH c.projetErp JOIN FETCH c.versionActive")
+    List<Client> findAllWithRelations();
+
+    @Query("SELECT c FROM Client c JOIN FETCH c.projetErp JOIN FETCH c.versionActive " +
+           "WHERE c.versionActive.id = :versionId")
     List<Client> findClientsParVersionActive(@Param("projetId") Long projetId,
                                              @Param("versionId") Long versionId);
 }
