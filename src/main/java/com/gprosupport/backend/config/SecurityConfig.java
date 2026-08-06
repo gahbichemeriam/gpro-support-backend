@@ -17,6 +17,11 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+
+import java.util.List;
 
 @Configuration
 @EnableWebSecurity
@@ -29,30 +34,53 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
+            // 1. Activer CORS avec notre configuration globale
+            .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+            // 2. Désactiver CSRF (inutile pour une API REST JWT)
             .csrf(AbstractHttpConfigurer::disable)
             .authorizeHttpRequests(auth -> auth
-                // Routes publiques : login et register accessibles sans token
                 .requestMatchers("/api/auth/**").permitAll()
-                // Swagger accessible sans token (pour les tests)
                 .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
-                // Toutes les autres routes nécessitent un token JWT valide
                 .anyRequest().authenticated()
             )
-            // STATELESS = pas de session HTTP côté serveur
-            // Chaque requête doit porter son propre token JWT
             .sessionManagement(session ->
                 session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
             )
             .authenticationProvider(authenticationProvider())
-            // Ajouter notre filtre JWT AVANT le filtre d'authentification standard
             .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }
 
     /**
-     * Provider qui utilise notre UserDetailsService + BCrypt pour vérifier les credentials.
+     * Configuration CORS globale — autorise Angular (localhost:4200) à appeler l'API.
+     * Cette configuration s'applique à TOUTES les routes, y compris les preflight OPTIONS.
      */
+    @Bean
+    public CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration config = new CorsConfiguration();
+
+        // Origines autorisées
+        config.setAllowedOrigins(List.of("http://localhost:4200"));
+
+        // Méthodes HTTP autorisées
+        config.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
+
+        // Headers autorisés (incluant Authorization pour JWT)
+        config.setAllowedHeaders(List.of("*"));
+
+        // Autoriser les cookies / credentials
+        config.setAllowCredentials(true);
+
+        // Durée de cache du preflight (en secondes)
+        config.setMaxAge(3600L);
+
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        // Appliquer à toutes les routes
+        source.registerCorsConfiguration("/**", config);
+        return source;
+    }
+
     @Bean
     public AuthenticationProvider authenticationProvider() {
         DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
@@ -61,9 +89,6 @@ public class SecurityConfig {
         return provider;
     }
 
-    /**
-     * AuthenticationManager utilisé dans UtilisateurService pour le login.
-     */
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration config)
             throws Exception {
