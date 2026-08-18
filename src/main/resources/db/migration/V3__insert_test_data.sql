@@ -6,9 +6,9 @@
 -- ===== UTILISATEURS =====
 -- Mot de passe : admin123
 INSERT INTO utilisateur (nom, email, mot_de_passe_hash, role) VALUES
-('Meriam Gahbiche', 'meriam.gahbiche@polytechnicien.tn', '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LPVLGf4A8RW', 'ADMIN'),
-('Agent Support',   'agent@gpro.tn',                    '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LPVLGf4A8RW', 'AGENT_SUPPORT'),
-('Ingenieur RD',    'rd@gpro.tn',                       '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LPVLGf4A8RW', 'RD')
+('Meriam Gahbiche', 'meriam.gahbiche@polytechnicien.tn', '$2a$10$ddsvi9Vs2BtkrxsV1UB4p.hTKOPxy3.MwW87TdcoMXYhRwcLQziEW', 'ADMIN'),
+('Agent Support',   'agent@gpro.tn',                    '$2a$10$ddsvi9Vs2BtkrxsV1UB4p.hTKOPxy3.MwW87TdcoMXYhRwcLQziEW', 'AGENT_SUPPORT'),
+('Ingenieur RD',    'rd@gpro.tn',                       '$2a$10$ddsvi9Vs2BtkrxsV1UB4p.hTKOPxy3.MwW87TdcoMXYhRwcLQziEW', 'RD')
 ON CONFLICT (email) DO NOTHING;
 
 -- ===== PROJETS ERP =====
