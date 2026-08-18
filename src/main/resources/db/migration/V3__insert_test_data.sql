@@ -1,6 +1,8 @@
 -- ============================================
 -- GPRO Support - Migration V3
 -- Donnees de test
+-- Note: Les utilisateurs sont crees via l'API /register
+-- pour garantir un hashage BCrypt correct
 -- ============================================
 
 -- ===== UTILISATEURS =====
