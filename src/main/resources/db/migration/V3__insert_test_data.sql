@@ -40,21 +40,21 @@ SELECT id, 'Tresorerie',         'Gestion des flux de tresorerie'             FR
 
 -- ===== VERSIONS ERP =====
 INSERT INTO version_erp (projet_id, code_version, date_release, statut)
-SELECT id, '1.6.0', '2023-01-15', 'OBSOLETE'      FROM projet_erp WHERE code_produit='GPRO-IND-001'
+SELECT id, '1.6.0', '2023-01-15'::date, 'DEVELOPPEMENT'::statut_version FROM projet_erp WHERE code_produit='GPRO-IND-001'
 UNION ALL
-SELECT id, '1.7.0', '2023-07-01', 'OBSOLETE'      FROM projet_erp WHERE code_produit='GPRO-IND-001'
+SELECT id, '1.7.0', '2023-07-01'::date, 'DEVELOPPEMENT'::statut_version FROM projet_erp WHERE code_produit='GPRO-IND-001'
 UNION ALL
-SELECT id, '1.8.2', '2024-02-10', 'PRODUCTION'    FROM projet_erp WHERE code_produit='GPRO-IND-001'
+SELECT id, '1.8.2', '2024-02-10'::date, 'PRODUCTION'::statut_version    FROM projet_erp WHERE code_produit='GPRO-IND-001'
 UNION ALL
-SELECT id, '1.9.0', '2024-09-01', 'STAGING'       FROM projet_erp WHERE code_produit='GPRO-IND-001'
+SELECT id, '1.9.0', '2024-09-01'::date, 'STAGING'::statut_version       FROM projet_erp WHERE code_produit='GPRO-IND-001'
 UNION ALL
-SELECT id, '2.0.1', '2025-01-20', 'DEVELOPPEMENT' FROM projet_erp WHERE code_produit='GPRO-IND-001'
+SELECT id, '2.0.1', '2025-01-20'::date, 'DEVELOPPEMENT'::statut_version FROM projet_erp WHERE code_produit='GPRO-IND-001'
 UNION ALL
-SELECT id, '3.1.0', '2023-11-01', 'PRODUCTION'    FROM projet_erp WHERE code_produit='GPRO-RET-002'
+SELECT id, '3.1.0', '2023-11-01'::date, 'PRODUCTION'::statut_version    FROM projet_erp WHERE code_produit='GPRO-RET-002'
 UNION ALL
-SELECT id, '3.2.0', '2024-06-15', 'STAGING'       FROM projet_erp WHERE code_produit='GPRO-RET-002'
+SELECT id, '3.2.0', '2024-06-15'::date, 'STAGING'::statut_version       FROM projet_erp WHERE code_produit='GPRO-RET-002'
 UNION ALL
-SELECT id, '2.0.0', '2024-01-01', 'PRODUCTION'    FROM projet_erp WHERE code_produit='GPRO-FIN-003'
+SELECT id, '2.0.0', '2024-01-01'::date, 'PRODUCTION'::statut_version    FROM projet_erp WHERE code_produit='GPRO-FIN-003'
 ON CONFLICT (projet_id, code_version) DO NOTHING;
 
 -- ===== CLIENTS =====
