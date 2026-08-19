@@ -30,6 +30,8 @@ import java.util.List;
  *   400 Bad Request → données invalides
  *   404 Not Found   → ressource introuvable
  */
+import org.springframework.security.access.prepost.PreAuthorize;
+
 @RestController
 @RequestMapping("/api/projets")
 @CrossOrigin(origins = "http://localhost:4200")
@@ -38,11 +40,9 @@ public class ProjetErpController {
 
     private final ProjetErpService projetService;
 
-    /**
-     * GET /api/projets
-     * Récupère la liste de tous les projets ERP.
-     */
+    /** Tous les rôles peuvent lire */
     @GetMapping
+    @PreAuthorize("hasAnyRole('ADMIN','RD','AGENT_SUPPORT')")
     public ResponseEntity<ApiResponse<List<ProjetErpResponse>>> findAll() {
         List<ProjetErpResponse> projets = projetService.findAll();
         return ResponseEntity.ok(
@@ -50,12 +50,8 @@ public class ProjetErpController {
         );
     }
 
-    /**
-     * GET /api/projets/{id}
-     * Récupère un projet par son identifiant.
-     * @PathVariable → extrait l'id depuis l'URL (ex : /api/projets/1 → id = 1)
-     */
     @GetMapping("/{id}")
+    @PreAuthorize("hasAnyRole('ADMIN','RD','AGENT_SUPPORT')")
     public ResponseEntity<ApiResponse<ProjetErpResponse>> findById(@PathVariable Long id) {
         ProjetErpResponse projet = projetService.findById(id);
         return ResponseEntity.ok(
@@ -63,13 +59,9 @@ public class ProjetErpController {
         );
     }
 
-    /**
-     * POST /api/projets
-     * Crée un nouveau projet ERP.
-     * @RequestBody → désérialise le JSON du body en ProjetErpRequest
-     * @Valid → déclenche la validation des annotations (@NotBlank, @Size...)
-     */
+    /** Seul ADMIN peut créer/modifier/supprimer des projets */
     @PostMapping
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ApiResponse<ProjetErpResponse>> create(
             @Valid @RequestBody ProjetErpRequest request) {
         ProjetErpResponse created = projetService.create(request);
@@ -78,11 +70,8 @@ public class ProjetErpController {
                 .body(ApiResponse.success("Projet créé avec succès.", created));
     }
 
-    /**
-     * PUT /api/projets/{id}
-     * Met à jour un projet existant.
-     */
     @PutMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ApiResponse<ProjetErpResponse>> update(
             @PathVariable Long id,
             @Valid @RequestBody ProjetErpRequest request) {
@@ -92,11 +81,8 @@ public class ProjetErpController {
         );
     }
 
-    /**
-     * DELETE /api/projets/{id}
-     * Supprime un projet (et en cascade ses modules, versions, clients).
-     */
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ApiResponse<Void>> delete(@PathVariable Long id) {
         projetService.delete(id);
         return ResponseEntity

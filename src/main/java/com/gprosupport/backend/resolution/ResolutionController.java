@@ -7,6 +7,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -19,59 +20,42 @@ public class ResolutionController {
 
     private final ResolutionService resolutionService;
 
-    /**
-     * GET /api/resolutions               → toutes les résolutions
-     * GET /api/resolutions?problemeId=1  → résolutions d'un problème précis
-     */
     @GetMapping
+    @PreAuthorize("hasAnyRole('ADMIN','RD','AGENT_SUPPORT')")
     public ResponseEntity<ApiResponse<List<ResolutionResponse>>> findAll(
             @RequestParam(required = false) Long problemeId) {
-        return ResponseEntity.ok(
-            ApiResponse.success("Résolutions récupérées.", resolutionService.findAll(problemeId))
-        );
+        return ResponseEntity.ok(ApiResponse.success("Résolutions récupérées.", resolutionService.findAll(problemeId)));
     }
 
-    /** GET /api/resolutions/{id} */
     @GetMapping("/{id}")
+    @PreAuthorize("hasAnyRole('ADMIN','RD','AGENT_SUPPORT')")
     public ResponseEntity<ApiResponse<ResolutionResponse>> findById(@PathVariable Long id) {
-        return ResponseEntity.ok(
-            ApiResponse.success("Résolution trouvée.", resolutionService.findById(id))
-        );
+        return ResponseEntity.ok(ApiResponse.success("Résolution trouvée.", resolutionService.findById(id)));
     }
 
-    /** POST /api/resolutions */
     @PostMapping
-    public ResponseEntity<ApiResponse<ResolutionResponse>> create(
-            @Valid @RequestBody ResolutionRequest request) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(
-            ApiResponse.success("Résolution créée avec succès.", resolutionService.create(request))
-        );
+    @PreAuthorize("hasAnyRole('ADMIN','RD')")
+    public ResponseEntity<ApiResponse<ResolutionResponse>> create(@Valid @RequestBody ResolutionRequest request) {
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(ApiResponse.success("Résolution créée.", resolutionService.create(request)));
     }
 
-    /** PUT /api/resolutions/{id} */
     @PutMapping("/{id}")
+    @PreAuthorize("hasAnyRole('ADMIN','RD')")
     public ResponseEntity<ApiResponse<ResolutionResponse>> update(
-            @PathVariable Long id,
-            @Valid @RequestBody ResolutionRequest request) {
-        return ResponseEntity.ok(
-            ApiResponse.success("Résolution mise à jour.", resolutionService.update(id, request))
-        );
+            @PathVariable Long id, @Valid @RequestBody ResolutionRequest request) {
+        return ResponseEntity.ok(ApiResponse.success("Résolution mise à jour.", resolutionService.update(id, request)));
     }
 
-    /**
-     * PATCH /api/resolutions/{id}/valider
-     * Valide une résolution (approuvée par QA).
-     * PATCH = modification partielle d'une ressource (juste le champ validationQa ici).
-     */
+    /** Validation QA — ADMIN et RD seulement */
     @PatchMapping("/{id}/valider")
+    @PreAuthorize("hasAnyRole('ADMIN','RD')")
     public ResponseEntity<ApiResponse<ResolutionResponse>> valider(@PathVariable Long id) {
-        return ResponseEntity.ok(
-            ApiResponse.success("Résolution validée par QA.", resolutionService.valider(id))
-        );
+        return ResponseEntity.ok(ApiResponse.success("Résolution validée par QA.", resolutionService.valider(id)));
     }
 
-    /** DELETE /api/resolutions/{id} */
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasAnyRole('ADMIN','RD')")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         resolutionService.delete(id);
         return ResponseEntity.noContent().build();

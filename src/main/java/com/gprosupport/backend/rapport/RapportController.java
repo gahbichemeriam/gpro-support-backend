@@ -15,6 +15,8 @@ import java.util.Map;
  * - KPI support (MTTR, FCR, tickets ouverts/clôturés)
  * - Matrice de compatibilité
  */
+import org.springframework.security.access.prepost.PreAuthorize;
+
 @RestController
 @RequestMapping("/api/rapports")
 @CrossOrigin(origins = "http://localhost:4200")
@@ -23,11 +25,8 @@ public class RapportController {
 
     private final RapportService rapportService;
 
-    /**
-     * GET /api/rapports/top-pannes
-     * Les problèmes les plus fréquents par module.
-     */
     @GetMapping("/top-pannes")
+    @PreAuthorize("hasAnyRole('ADMIN','RD')")
     public ResponseEntity<ApiResponse<List<TopPanneDTO>>> getTopPannes(
             @RequestParam(defaultValue = "10") int limit) {
         return ResponseEntity.ok(
@@ -35,33 +34,24 @@ public class RapportController {
         );
     }
 
-    /**
-     * GET /api/rapports/kpi
-     * Indicateurs clés de performance du support.
-     */
     @GetMapping("/kpi")
+    @PreAuthorize("hasAnyRole('ADMIN','RD')")
     public ResponseEntity<ApiResponse<KpiDTO>> getKpi() {
         return ResponseEntity.ok(
             ApiResponse.success("KPI récupérés.", rapportService.getKpi())
         );
     }
 
-    /**
-     * GET /api/rapports/par-module
-     * Nombre de problèmes par module.
-     */
     @GetMapping("/par-module")
+    @PreAuthorize("hasAnyRole('ADMIN','RD')")
     public ResponseEntity<ApiResponse<List<Map<String, Object>>>> getParModule() {
         return ResponseEntity.ok(
             ApiResponse.success("Stats par module.", rapportService.getStatsParModule())
         );
     }
 
-    /**
-     * GET /api/rapports/par-priorite
-     * Répartition des problèmes par priorité.
-     */
     @GetMapping("/par-priorite")
+    @PreAuthorize("hasAnyRole('ADMIN','RD')")
     public ResponseEntity<ApiResponse<List<Map<String, Object>>>> getParPriorite() {
         return ResponseEntity.ok(
             ApiResponse.success("Stats par priorité.", rapportService.getStatsParPriorite())

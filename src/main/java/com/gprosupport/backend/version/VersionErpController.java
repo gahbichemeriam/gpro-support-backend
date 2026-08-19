@@ -7,6 +7,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -19,43 +20,35 @@ public class VersionErpController {
 
     private final VersionErpService versionService;
 
-    /** GET /api/versions?projetId=1 */
     @GetMapping
+    @PreAuthorize("hasAnyRole('ADMIN','RD','AGENT_SUPPORT')")
     public ResponseEntity<ApiResponse<List<VersionErpResponse>>> findAll(
             @RequestParam(required = false) Long projetId) {
-        return ResponseEntity.ok(
-            ApiResponse.success("Versions récupérées.", versionService.findAll(projetId))
-        );
+        return ResponseEntity.ok(ApiResponse.success("Versions récupérées.", versionService.findAll(projetId)));
     }
 
-    /** GET /api/versions/{id} */
     @GetMapping("/{id}")
+    @PreAuthorize("hasAnyRole('ADMIN','RD','AGENT_SUPPORT')")
     public ResponseEntity<ApiResponse<VersionErpResponse>> findById(@PathVariable Long id) {
-        return ResponseEntity.ok(
-            ApiResponse.success("Version trouvée.", versionService.findById(id))
-        );
+        return ResponseEntity.ok(ApiResponse.success("Version trouvée.", versionService.findById(id)));
     }
 
-    /** POST /api/versions */
     @PostMapping
-    public ResponseEntity<ApiResponse<VersionErpResponse>> create(
-            @Valid @RequestBody VersionErpRequest request) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(
-            ApiResponse.success("Version créée avec succès.", versionService.create(request))
-        );
+    @PreAuthorize("hasAnyRole('ADMIN','RD')")
+    public ResponseEntity<ApiResponse<VersionErpResponse>> create(@Valid @RequestBody VersionErpRequest request) {
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(ApiResponse.success("Version créée.", versionService.create(request)));
     }
 
-    /** PUT /api/versions/{id} */
     @PutMapping("/{id}")
+    @PreAuthorize("hasAnyRole('ADMIN','RD')")
     public ResponseEntity<ApiResponse<VersionErpResponse>> update(
             @PathVariable Long id, @Valid @RequestBody VersionErpRequest request) {
-        return ResponseEntity.ok(
-            ApiResponse.success("Version mise à jour.", versionService.update(id, request))
-        );
+        return ResponseEntity.ok(ApiResponse.success("Version mise à jour.", versionService.update(id, request)));
     }
 
-    /** DELETE /api/versions/{id} */
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasAnyRole('ADMIN','RD')")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         versionService.delete(id);
         return ResponseEntity.noContent().build();

@@ -7,6 +7,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -19,43 +20,36 @@ public class ClientController {
 
     private final ClientService clientService;
 
-    /** GET /api/clients?projetId=1 */
     @GetMapping
+    @PreAuthorize("hasAnyRole('ADMIN','RD','AGENT_SUPPORT')")
     public ResponseEntity<ApiResponse<List<ClientResponse>>> findAll(
             @RequestParam(required = false) Long projetId) {
-        return ResponseEntity.ok(
-            ApiResponse.success("Clients récupérés.", clientService.findAll(projetId))
-        );
+        return ResponseEntity.ok(ApiResponse.success("Clients récupérés.", clientService.findAll(projetId)));
     }
 
-    /** GET /api/clients/{id} */
     @GetMapping("/{id}")
+    @PreAuthorize("hasAnyRole('ADMIN','RD','AGENT_SUPPORT')")
     public ResponseEntity<ApiResponse<ClientResponse>> findById(@PathVariable Long id) {
-        return ResponseEntity.ok(
-            ApiResponse.success("Client trouvé.", clientService.findById(id))
-        );
+        return ResponseEntity.ok(ApiResponse.success("Client trouvé.", clientService.findById(id)));
     }
 
-    /** POST /api/clients */
+    /** Seul ADMIN gère le parc clients */
     @PostMapping
-    public ResponseEntity<ApiResponse<ClientResponse>> create(
-            @Valid @RequestBody ClientRequest request) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(
-            ApiResponse.success("Client créé avec succès.", clientService.create(request))
-        );
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<ApiResponse<ClientResponse>> create(@Valid @RequestBody ClientRequest request) {
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(ApiResponse.success("Client créé.", clientService.create(request)));
     }
 
-    /** PUT /api/clients/{id} */
     @PutMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ApiResponse<ClientResponse>> update(
             @PathVariable Long id, @Valid @RequestBody ClientRequest request) {
-        return ResponseEntity.ok(
-            ApiResponse.success("Client mis à jour.", clientService.update(id, request))
-        );
+        return ResponseEntity.ok(ApiResponse.success("Client mis à jour.", clientService.update(id, request)));
     }
 
-    /** DELETE /api/clients/{id} */
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         clientService.delete(id);
         return ResponseEntity.noContent().build();
